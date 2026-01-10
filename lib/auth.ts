@@ -2,12 +2,22 @@ import { NextAuthOptions } from 'next-auth'
 import CredentialsProvider from 'next-auth/providers/credentials'
 import GoogleProvider from 'next-auth/providers/google'
 
+// 只有在配置了 Google OAuth 时才添加 GoogleProvider
+const providers: NextAuthOptions['providers'] = []
+
+// 检查 Google OAuth 配置
+if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
+  providers.push(
+    GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+    })
+  )
+}
+
 export const authOptions: NextAuthOptions = {
   providers: [
-    GoogleProvider({
-      clientId: process.env.GOOGLE_CLIENT_ID || '',
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET || '',
-    }),
+    ...providers,
     CredentialsProvider({
       name: 'credentials',
       credentials: {
@@ -71,4 +81,6 @@ export const authOptions: NextAuthOptions = {
     },
   },
   secret: process.env.NEXTAUTH_SECRET,
+  // 添加调试模式以便在控制台查看错误
+  debug: process.env.NODE_ENV === 'development',
 }
