@@ -17,7 +17,7 @@ export default function UserRoleUpdater({
   const [isUpdating, setIsUpdating] = useState(false)
 
   // 防止管理员修改自己的角色
-  const isCurrentUser = session?.user?.id === userId
+  const isCurrentUser = (session?.user as any)?.id === userId
 
   const handleUpdate = async () => {
     if (role === currentRole) return

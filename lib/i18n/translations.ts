@@ -88,6 +88,7 @@ export const translations = {
       search: 'Search',
       min: 'Min',
       max: 'Max',
+      quantity: 'Quantity',
     },
     
     // Cart
@@ -312,6 +313,7 @@ export const translations = {
       search: '搜索',
       min: '最低',
       max: '最高',
+      quantity: '数量',
     },
     
     // Cart
@@ -530,6 +532,7 @@ export type TranslationKeys = {
     search: string
     min: string
     max: string
+    quantity: string
   }
   cart: {
     title: string

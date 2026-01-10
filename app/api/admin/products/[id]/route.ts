@@ -97,8 +97,7 @@ export async function DELETE(
   }
 
   try {
-    // 删除相关的购物车项和收藏
-    await prisma.cartItem.deleteMany({ where: { productId: params.id } })
+    // 删除相关的收藏
     await prisma.wishlistItem.deleteMany({ where: { productId: params.id } })
     
     // 删除商品

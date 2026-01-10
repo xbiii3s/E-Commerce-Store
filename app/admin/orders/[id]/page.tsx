@@ -104,7 +104,7 @@ export default async function OrderDetailPage({
               </div>
               <div className="flex justify-between text-gray-600">
                 <span>运费</span>
-                <span>${order.shippingFee?.toFixed(2) || '0.00'}</span>
+                <span>${order.shipping?.toFixed(2) || '0.00'}</span>
               </div>
               <div className="flex justify-between text-lg font-semibold">
                 <span>总计</span>
@@ -173,7 +173,7 @@ export default async function OrderDetailPage({
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
                 <span className="text-gray-500">支付方式</span>
-                <span>{order.paymentMethod || '在线支付'}</span>
+                <span>在线支付</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-500">支付状态</span>
@@ -183,14 +183,6 @@ export default async function OrderDetailPage({
               </div>
             </div>
           </div>
-
-          {/* 备注 */}
-          {order.notes && (
-            <div className="bg-white rounded-xl shadow-sm p-6">
-              <h2 className="text-lg font-semibold mb-4">订单备注</h2>
-              <p className="text-gray-600 text-sm">{order.notes}</p>
-            </div>
-          )}
         </div>
       </div>
     </div>
