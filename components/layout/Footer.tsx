@@ -1,6 +1,11 @@
+'use client'
+
 import Link from 'next/link'
+import { useTranslation } from '@/lib/i18n/context'
 
 export default function Footer() {
+  const { t } = useTranslation()
+
   return (
     <footer className="bg-gray-900 text-gray-300">
       <div className="container mx-auto px-4 py-12">
@@ -9,7 +14,7 @@ export default function Footer() {
           <div>
             <h3 className="text-white text-xl font-bold mb-4">E-Store</h3>
             <p className="text-sm mb-4">
-              Your premium online shopping destination. Quality products, great prices, and excellent customer service.
+              {t.footer.aboutDesc}
             </p>
             <div className="flex gap-4">
               <a href="#" className="hover:text-white transition">
@@ -32,30 +37,28 @@ export default function Footer() {
 
           {/* Quick Links */}
           <div>
-            <h4 className="text-white font-semibold mb-4">Quick Links</h4>
+            <h4 className="text-white font-semibold mb-4">{t.footer.quickLinks}</h4>
             <ul className="space-y-2 text-sm">
-              <li><Link href="/products" className="hover:text-white transition">All Products</Link></li>
-              <li><Link href="/categories" className="hover:text-white transition">Categories</Link></li>
-              <li><Link href="/products?featured=true" className="hover:text-white transition">Featured</Link></li>
-              <li><Link href="/products?sale=true" className="hover:text-white transition">On Sale</Link></li>
+              <li><Link href="/products" className="hover:text-white transition">{t.products.allProducts}</Link></li>
+              <li><Link href="/categories" className="hover:text-white transition">{t.nav.categories}</Link></li>
+              <li><Link href="/products?featured=true" className="hover:text-white transition">{t.home.featuredProducts}</Link></li>
             </ul>
           </div>
 
           {/* Customer Service */}
           <div>
-            <h4 className="text-white font-semibold mb-4">Customer Service</h4>
+            <h4 className="text-white font-semibold mb-4">{t.footer.customerService}</h4>
             <ul className="space-y-2 text-sm">
-              <li><Link href="/contact" className="hover:text-white transition">Contact Us</Link></li>
-              <li><Link href="/faq" className="hover:text-white transition">FAQ</Link></li>
-              <li><Link href="/shipping" className="hover:text-white transition">Shipping Info</Link></li>
-              <li><Link href="/returns" className="hover:text-white transition">Returns & Exchanges</Link></li>
-              <li><Link href="/track-order" className="hover:text-white transition">Track Order</Link></li>
+              <li><Link href="/contact" className="hover:text-white transition">{t.footer.contactUs}</Link></li>
+              <li><Link href="/faq" className="hover:text-white transition">{t.footer.faq}</Link></li>
+              <li><Link href="/shipping" className="hover:text-white transition">{t.footer.shippingInfo}</Link></li>
+              <li><Link href="/returns" className="hover:text-white transition">{t.footer.returns}</Link></li>
             </ul>
           </div>
 
           {/* Contact Info */}
           <div>
-            <h4 className="text-white font-semibold mb-4">Contact Us</h4>
+            <h4 className="text-white font-semibold mb-4">{t.footer.contactUs}</h4>
             <ul className="space-y-2 text-sm">
               <li className="flex items-center gap-2">
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -83,7 +86,7 @@ export default function Footer() {
         {/* Payment Methods */}
         <div className="border-t border-gray-800 mt-8 pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-            <p className="text-sm">© 2024 E-Store. All rights reserved.</p>
+            <p className="text-sm">© 2026 E-Store. {t.footer.allRightsReserved}</p>
             <div className="flex items-center gap-4">
               <span className="text-sm">We accept:</span>
               <div className="flex gap-2">

@@ -2,6 +2,7 @@
 
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useState } from 'react'
+import { useTranslation } from '@/lib/i18n/context'
 
 interface Category {
   id: string
@@ -13,6 +14,7 @@ interface Category {
 export default function ProductFilters({ categories }: { categories: Category[] }) {
   const router = useRouter()
   const searchParams = useSearchParams()
+  const { t, translateCategory } = useTranslation()
   const [minPrice, setMinPrice] = useState(searchParams.get('minPrice') || '')
   const [maxPrice, setMaxPrice] = useState(searchParams.get('maxPrice') || '')
 
@@ -47,18 +49,18 @@ export default function ProductFilters({ categories }: { categories: Category[] 
   return (
     <div className="bg-white rounded-lg shadow-sm p-4">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="font-semibold text-lg">Filters</h2>
+        <h2 className="font-semibold text-lg">{t.products.filters}</h2>
         <button
           onClick={clearFilters}
           className="text-sm text-primary-600 hover:underline"
         >
-          Clear all
+          {t.products.clearAll}
         </button>
       </div>
 
       {/* Categories */}
       <div className="mb-6">
-        <h3 className="font-medium mb-3">Categories</h3>
+        <h3 className="font-medium mb-3">{t.products.category}</h3>
         <ul className="space-y-2">
           <li>
             <button
@@ -69,7 +71,7 @@ export default function ProductFilters({ categories }: { categories: Category[] 
                   : 'hover:bg-gray-50'
               }`}
             >
-              All Products
+              {t.products.allProducts}
             </button>
           </li>
           {categories.map((category) => (
@@ -82,7 +84,7 @@ export default function ProductFilters({ categories }: { categories: Category[] 
                     : 'hover:bg-gray-50'
                 }`}
               >
-                <span>{category.name}</span>
+                <span>{translateCategory(category.name)}</span>
                 <span className="text-sm text-gray-400">
                   {category._count.products}
                 </span>
@@ -94,12 +96,12 @@ export default function ProductFilters({ categories }: { categories: Category[] 
 
       {/* Price Range */}
       <div className="mb-6">
-        <h3 className="font-medium mb-3">Price Range</h3>
+        <h3 className="font-medium mb-3">{t.products.priceRange}</h3>
         <form onSubmit={handlePriceFilter} className="space-y-3">
           <div className="flex gap-2">
             <input
               type="number"
-              placeholder="Min"
+              placeholder={t.products.min}
               value={minPrice}
               onChange={(e) => setMinPrice(e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
@@ -107,7 +109,7 @@ export default function ProductFilters({ categories }: { categories: Category[] 
             <span className="text-gray-400 self-center">-</span>
             <input
               type="number"
-              placeholder="Max"
+              placeholder={t.products.max}
               value={maxPrice}
               onChange={(e) => setMaxPrice(e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
@@ -117,14 +119,14 @@ export default function ProductFilters({ categories }: { categories: Category[] 
             type="submit"
             className="w-full bg-primary-600 text-white py-2 rounded-lg hover:bg-primary-700 transition text-sm"
           >
-            Apply
+            {t.products.apply}
           </button>
         </form>
       </div>
 
       {/* Featured */}
       <div>
-        <h3 className="font-medium mb-3">Other</h3>
+        <h3 className="font-medium mb-3">{t.products.other}</h3>
         <label className="flex items-center gap-2 cursor-pointer">
           <input
             type="checkbox"
@@ -140,7 +142,7 @@ export default function ProductFilters({ categories }: { categories: Category[] 
             }}
             className="rounded text-primary-600 focus:ring-primary-500"
           />
-          <span className="text-sm">Featured only</span>
+          <span className="text-sm">{t.products.featuredOnly}</span>
         </label>
       </div>
     </div>

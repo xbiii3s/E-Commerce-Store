@@ -1,8 +1,11 @@
 'use client'
 
-import Image from 'next/image'
 import Link from 'next/link'
 import { useCart } from '@/components/providers/CartProvider'
+import { useToast } from '@/components/ui/Toaster'
+import { useTranslation } from '@/lib/i18n/context'
+import ProductImage from '@/components/ui/ProductImage'
+import WishlistButton from './WishlistButton'
 
 interface Product {
   id: string
@@ -14,10 +17,22 @@ interface Product {
   category?: { name: string; slug: string } | null
 }
 
+// 根据产品名生成 picsum 图片 URL
+function getProductImage(images: string, productName: string): string {
+  const parsed = JSON.parse(images || '[]')
+  if (parsed.length > 0 && !parsed[0].includes('via.placeholder')) {
+    return parsed[0]
+  }
+  // 使用产品名的哈希值生成一个稳定的随机图片
+  const hash = productName.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0)
+  return `https://picsum.photos/seed/${hash}/400/400`
+}
+
 export default function ProductCard({ product }: { product: Product }) {
   const { addItem } = useCart()
-  const images = JSON.parse(product.images || '[]')
-  const mainImage = images[0] || 'https://via.placeholder.com/400x400?text=No+Image'
+  const { toast } = useToast()
+  const { t, translateCategory } = useTranslation()
+  const mainImage = getProductImage(product.images, product.name)
 
   const discount = product.comparePrice
     ? Math.round((1 - product.price / product.comparePrice) * 100)
@@ -31,14 +46,15 @@ export default function ProductCard({ product }: { product: Product }) {
       price: product.price,
       image: mainImage,
     })
+    toast(t.products.addedToCart, 'success')
   }
 
   return (
     <Link href={`/products/${product.slug}`} className="group">
       <div className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition">
         {/* Image */}
-        <div className="aspect-square relative bg-gray-100">
-          <Image
+        <div className="aspect-square relative bg-gray-100 overflow-hidden">
+          <ProductImage
             src={mainImage}
             alt={product.name}
             fill
@@ -50,6 +66,10 @@ export default function ProductCard({ product }: { product: Product }) {
               -{discount}%
             </span>
           )}
+          {/* Wishlist button */}
+          <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition">
+            <WishlistButton productId={product.id} size="sm" />
+          </div>
           {/* Quick add button */}
           <button
             onClick={handleAddToCart}
@@ -64,7 +84,7 @@ export default function ProductCard({ product }: { product: Product }) {
         {/* Info */}
         <div className="p-4">
           {product.category && (
-            <p className="text-xs text-gray-500 mb-1">{product.category.name}</p>
+            <p className="text-xs text-gray-500 mb-1">{translateCategory(product.category.name)}</p>
           )}
           <h3 className="font-medium text-gray-800 group-hover:text-primary-600 transition line-clamp-2">
             {product.name}

@@ -3,27 +3,27 @@
 import Link from 'next/link'
 import { useState } from 'react'
 import { useCart } from '@/components/providers/CartProvider'
+import { useTranslation } from '@/lib/i18n/context'
+import LanguageSwitcher from '@/components/ui/LanguageSwitcher'
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isSearchOpen, setIsSearchOpen] = useState(false)
-  const { items, itemCount } = useCart()
+  const { itemCount } = useCart()
+  const { t } = useTranslation()
 
   return (
     <header className="bg-white shadow-sm sticky top-0 z-50">
       {/* Top bar */}
       <div className="bg-primary-700 text-white text-sm py-2">
         <div className="container mx-auto px-4 flex justify-between items-center">
-          <p>Free shipping on orders over $50</p>
-          <div className="flex gap-4">
-            <select className="bg-transparent text-white text-sm border-none focus:outline-none cursor-pointer">
-              <option value="en">English</option>
-              <option value="zh">中文</option>
-            </select>
+          <p>{t.home.freeShippingDesc}</p>
+          <div className="flex items-center gap-4">
+            <LanguageSwitcher />
             <select className="bg-transparent text-white text-sm border-none focus:outline-none cursor-pointer">
               <option value="USD">USD $</option>
+              <option value="CNY">CNY ¥</option>
               <option value="EUR">EUR €</option>
-              <option value="GBP">GBP £</option>
             </select>
           </div>
         </div>
@@ -40,19 +40,13 @@ export default function Header() {
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center gap-8">
             <Link href="/" className="text-gray-700 hover:text-primary-600 transition">
-              Home
+              {t.nav.home}
             </Link>
             <Link href="/products" className="text-gray-700 hover:text-primary-600 transition">
-              Products
+              {t.nav.products}
             </Link>
             <Link href="/categories" className="text-gray-700 hover:text-primary-600 transition">
-              Categories
-            </Link>
-            <Link href="/about" className="text-gray-700 hover:text-primary-600 transition">
-              About
-            </Link>
-            <Link href="/contact" className="text-gray-700 hover:text-primary-600 transition">
-              Contact
+              {t.nav.categories}
             </Link>
           </nav>
 
@@ -122,14 +116,14 @@ export default function Header() {
               <input
                 type="text"
                 name="search"
-                placeholder="Search products..."
+                placeholder={t.nav.search}
                 className="flex-grow px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
               />
               <button
                 type="submit"
                 className="bg-primary-600 text-white px-6 py-2 rounded-lg hover:bg-primary-700 transition"
               >
-                Search
+                🔍
               </button>
             </form>
           </div>
@@ -140,19 +134,19 @@ export default function Header() {
           <nav className="md:hidden mt-4 pb-4 border-t pt-4">
             <div className="flex flex-col gap-4">
               <Link href="/" className="text-gray-700 hover:text-primary-600 transition">
-                Home
+                {t.nav.home}
               </Link>
               <Link href="/products" className="text-gray-700 hover:text-primary-600 transition">
-                Products
+                {t.nav.products}
               </Link>
               <Link href="/categories" className="text-gray-700 hover:text-primary-600 transition">
-                Categories
+                {t.nav.categories}
               </Link>
-              <Link href="/about" className="text-gray-700 hover:text-primary-600 transition">
-                About
+              <Link href="/cart" className="text-gray-700 hover:text-primary-600 transition">
+                {t.nav.cart}
               </Link>
-              <Link href="/contact" className="text-gray-700 hover:text-primary-600 transition">
-                Contact
+              <Link href="/account" className="text-gray-700 hover:text-primary-600 transition">
+                {t.nav.account}
               </Link>
             </div>
           </nav>

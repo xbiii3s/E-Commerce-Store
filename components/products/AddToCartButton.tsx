@@ -2,6 +2,8 @@
 
 import { useState } from 'react'
 import { useCart } from '@/components/providers/CartProvider'
+import { useTranslation } from '@/lib/i18n/context'
+import WishlistButton from './WishlistButton'
 
 interface Product {
   id: string
@@ -18,6 +20,7 @@ export default function AddToCartButton({
   disabled?: boolean
 }) {
   const { addItem } = useCart()
+  const { t } = useTranslation()
   const [quantity, setQuantity] = useState(1)
   const [added, setAdded] = useState(false)
 
@@ -33,7 +36,7 @@ export default function AddToCartButton({
     <div className="flex flex-col gap-4">
       {/* Quantity Selector */}
       <div className="flex items-center gap-4">
-        <span className="text-sm font-medium">Quantity:</span>
+        <span className="text-sm font-medium">{t.products.quantity}:</span>
         <div className="flex items-center border border-gray-300 rounded-lg">
           <button
             onClick={() => setQuantity(Math.max(1, quantity - 1))}
@@ -71,24 +74,20 @@ export default function AddToCartButton({
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
               </svg>
-              Added to Cart
+              {t.products.addedToCart}
             </>
           ) : (
             <>
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
               </svg>
-              Add to Cart
+              {t.products.addToCart}
             </>
           )}
         </button>
 
         {/* Wishlist Button */}
-        <button className="px-4 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition">
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-          </svg>
-        </button>
+        <WishlistButton productId={product.id} size="lg" />
       </div>
     </div>
   )

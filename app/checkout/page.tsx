@@ -4,10 +4,12 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useCart } from '@/components/providers/CartProvider'
 import Link from 'next/link'
+import { useTranslation } from '@/lib/i18n/context'
 
 export default function CheckoutPage() {
   const router = useRouter()
   const { items, subtotal, clearCart } = useCart()
+  const { t } = useTranslation()
   const [isLoading, setIsLoading] = useState(false)
   const [step, setStep] = useState(1)
 
@@ -80,9 +82,9 @@ export default function CheckoutPage() {
   if (items.length === 0) {
     return (
       <div className="container mx-auto px-4 py-16 text-center">
-        <h1 className="text-2xl font-bold mb-4">Your cart is empty</h1>
+        <h1 className="text-2xl font-bold mb-4">{t.cart.empty}</h1>
         <Link href="/products" className="text-primary-600 hover:underline">
-          Continue shopping
+          {t.cart.continueShopping}
         </Link>
       </div>
     )
@@ -92,9 +94,9 @@ export default function CheckoutPage() {
     <div className="container mx-auto px-4 py-8">
       {/* Breadcrumb */}
       <nav className="text-sm text-gray-500 mb-6">
-        <Link href="/cart" className="hover:text-primary-600">Cart</Link>
+        <Link href="/cart" className="hover:text-primary-600">{t.nav.cart}</Link>
         <span className="mx-2">/</span>
-        <span className="text-gray-800">Checkout</span>
+        <span className="text-gray-800">{t.checkout.title}</span>
       </nav>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
@@ -103,10 +105,10 @@ export default function CheckoutPage() {
           <form onSubmit={handleSubmit}>
             {/* Step 1: Contact & Shipping */}
             <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
-              <h2 className="text-xl font-bold mb-6">Contact Information</h2>
+              <h2 className="text-xl font-bold mb-6">{t.common.contactInfo}</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="md:col-span-2">
-                  <label className="block text-sm font-medium mb-1">Email</label>
+                  <label className="block text-sm font-medium mb-1">{t.checkout.email}</label>
                   <input
                     type="email"
                     name="email"
@@ -118,24 +120,24 @@ export default function CheckoutPage() {
                   />
                 </div>
                 <div className="md:col-span-2">
-                  <label className="block text-sm font-medium mb-1">Phone (optional)</label>
+                  <label className="block text-sm font-medium mb-1">{t.checkout.phone} ({t.common.optional})</label>
                   <input
                     type="tel"
                     name="phone"
                     value={formData.phone}
                     onChange={handleInputChange}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-                    placeholder="+1 (555) 123-4567"
+                    placeholder="+86 138 0000 0000"
                   />
                 </div>
               </div>
             </div>
 
             <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
-              <h2 className="text-xl font-bold mb-6">Shipping Address</h2>
+              <h2 className="text-xl font-bold mb-6">{t.common.shippingAddress}</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium mb-1">First Name</label>
+                  <label className="block text-sm font-medium mb-1">{t.checkout.firstName}</label>
                   <input
                     type="text"
                     name="firstName"
@@ -146,7 +148,7 @@ export default function CheckoutPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-1">Last Name</label>
+                  <label className="block text-sm font-medium mb-1">{t.checkout.lastName}</label>
                   <input
                     type="text"
                     name="lastName"
@@ -157,7 +159,7 @@ export default function CheckoutPage() {
                   />
                 </div>
                 <div className="md:col-span-2">
-                  <label className="block text-sm font-medium mb-1">Address</label>
+                  <label className="block text-sm font-medium mb-1">{t.checkout.address}</label>
                   <input
                     type="text"
                     name="address"
@@ -169,7 +171,7 @@ export default function CheckoutPage() {
                   />
                 </div>
                 <div className="md:col-span-2">
-                  <label className="block text-sm font-medium mb-1">Apartment, suite, etc. (optional)</label>
+                  <label className="block text-sm font-medium mb-1">{t.common.apartment} ({t.common.optional})</label>
                   <input
                     type="text"
                     name="apartment"
@@ -179,7 +181,7 @@ export default function CheckoutPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-1">City</label>
+                  <label className="block text-sm font-medium mb-1">{t.checkout.city}</label>
                   <input
                     type="text"
                     name="city"
@@ -190,7 +192,7 @@ export default function CheckoutPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-1">State / Province</label>
+                  <label className="block text-sm font-medium mb-1">{t.checkout.state}</label>
                   <input
                     type="text"
                     name="state"
@@ -201,7 +203,7 @@ export default function CheckoutPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-1">ZIP / Postal Code</label>
+                  <label className="block text-sm font-medium mb-1">{t.checkout.zipCode}</label>
                   <input
                     type="text"
                     name="zipCode"
@@ -212,21 +214,21 @@ export default function CheckoutPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-1">Country</label>
+                  <label className="block text-sm font-medium mb-1">{t.checkout.country}</label>
                   <select
                     name="country"
                     value={formData.country}
                     onChange={handleInputChange}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
                   >
-                    <option value="US">United States</option>
-                    <option value="CA">Canada</option>
-                    <option value="GB">United Kingdom</option>
-                    <option value="AU">Australia</option>
-                    <option value="DE">Germany</option>
-                    <option value="FR">France</option>
-                    <option value="CN">China</option>
-                    <option value="JP">Japan</option>
+                    <option value="CN">中国</option>
+                    <option value="US">美国</option>
+                    <option value="CA">加拿大</option>
+                    <option value="GB">英国</option>
+                    <option value="AU">澳大利亚</option>
+                    <option value="DE">德国</option>
+                    <option value="FR">法国</option>
+                    <option value="JP">日本</option>
                   </select>
                 </div>
               </div>
@@ -235,7 +237,7 @@ export default function CheckoutPage() {
             {/* Payment Info Note */}
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
               <p className="text-sm text-blue-800">
-                <strong>Secure Payment:</strong> You&apos;ll be redirected to Stripe&apos;s secure payment page to complete your purchase.
+                <strong>{t.home.securePayment}:</strong> {t.checkout.orderSuccessDesc}
               </p>
             </div>
 
@@ -244,7 +246,7 @@ export default function CheckoutPage() {
               disabled={isLoading}
               className="w-full bg-primary-600 text-white py-4 rounded-lg font-semibold hover:bg-primary-700 transition disabled:bg-gray-400 disabled:cursor-not-allowed"
             >
-              {isLoading ? 'Processing...' : `Pay $${total.toFixed(2)}`}
+              {isLoading ? t.common.loading : `${t.checkout.placeOrder} $${total.toFixed(2)}`}
             </button>
           </form>
         </div>
@@ -252,7 +254,7 @@ export default function CheckoutPage() {
         {/* Order Summary */}
         <div>
           <div className="bg-white rounded-lg shadow-sm p-6 sticky top-24">
-            <h2 className="text-xl font-bold mb-6">Order Summary</h2>
+            <h2 className="text-xl font-bold mb-6">{t.cart.orderSummary}</h2>
 
             {/* Items */}
             <div className="space-y-4 mb-6">
@@ -260,7 +262,7 @@ export default function CheckoutPage() {
                 <div key={item.id} className="flex gap-4">
                   <div className="w-16 h-16 relative bg-gray-100 rounded-lg overflow-hidden shrink-0">
                     <img
-                      src={item.image || 'https://via.placeholder.com/64x64?text=No+Image'}
+                      src={item.image || 'https://picsum.photos/64/64'}
                       alt={item.name}
                       className="w-full h-full object-cover"
                     />
@@ -270,7 +272,7 @@ export default function CheckoutPage() {
                   </div>
                   <div className="flex-grow">
                     <p className="font-medium text-sm">{item.name}</p>
-                    <p className="text-gray-500 text-sm">Qty: {item.quantity}</p>
+                    <p className="text-gray-500 text-sm">x {item.quantity}</p>
                   </div>
                   <p className="font-medium">${(item.price * item.quantity).toFixed(2)}</p>
                 </div>
@@ -280,19 +282,19 @@ export default function CheckoutPage() {
             {/* Totals */}
             <div className="border-t pt-4 space-y-2 text-sm">
               <div className="flex justify-between">
-                <span className="text-gray-600">Subtotal</span>
+                <span className="text-gray-600">{t.cart.subtotal}</span>
                 <span>${subtotal.toFixed(2)}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-600">Shipping</span>
-                <span>{shipping === 0 ? 'FREE' : `$${shipping.toFixed(2)}`}</span>
+                <span className="text-gray-600">{t.cart.shipping}</span>
+                <span>{shipping === 0 ? t.cart.free : `$${shipping.toFixed(2)}`}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-600">Tax</span>
+                <span className="text-gray-600">{t.cart.tax}</span>
                 <span>${tax.toFixed(2)}</span>
               </div>
               <div className="flex justify-between font-bold text-lg pt-2 border-t">
-                <span>Total</span>
+                <span>{t.cart.total}</span>
                 <span>${total.toFixed(2)}</span>
               </div>
             </div>

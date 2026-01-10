@@ -3,9 +3,11 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { useTranslation } from '@/lib/i18n/context'
 
 export default function SignUpPage() {
   const router = useRouter()
+  const { t } = useTranslation()
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -24,12 +26,12 @@ export default function SignUpPage() {
     setError('')
 
     if (formData.password !== formData.confirmPassword) {
-      setError('Passwords do not match')
+      setError(t.auth.passwordMismatch)
       return
     }
 
     if (formData.password.length < 8) {
-      setError('Password must be at least 8 characters')
+      setError(t.auth.passwordTooShort)
       return
     }
 
@@ -64,7 +66,7 @@ export default function SignUpPage() {
     <div className="min-h-[80vh] flex items-center justify-center px-4">
       <div className="w-full max-w-md">
         <div className="bg-white rounded-lg shadow-sm p-8">
-          <h1 className="text-2xl font-bold text-center mb-6">Create Account</h1>
+          <h1 className="text-2xl font-bold text-center mb-6">{t.auth.createAccount}</h1>
 
           {error && (
             <div className="bg-red-50 text-red-600 p-3 rounded-lg mb-4 text-sm">
@@ -74,7 +76,7 @@ export default function SignUpPage() {
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium mb-1">Full Name</label>
+              <label className="block text-sm font-medium mb-1">{t.auth.name}</label>
               <input
                 type="text"
                 name="name"
@@ -82,12 +84,12 @@ export default function SignUpPage() {
                 onChange={handleChange}
                 required
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-                placeholder="John Doe"
+                placeholder="张三"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-1">Email</label>
+              <label className="block text-sm font-medium mb-1">{t.auth.email}</label>
               <input
                 type="email"
                 name="email"
@@ -100,7 +102,7 @@ export default function SignUpPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-1">Password</label>
+              <label className="block text-sm font-medium mb-1">{t.auth.password}</label>
               <input
                 type="password"
                 name="password"
@@ -110,11 +112,11 @@ export default function SignUpPage() {
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
                 placeholder="••••••••"
               />
-              <p className="text-xs text-gray-500 mt-1">Minimum 8 characters</p>
+              <p className="text-xs text-gray-500 mt-1">{t.auth.minPassword}</p>
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-1">Confirm Password</label>
+              <label className="block text-sm font-medium mb-1">{t.auth.confirmPassword}</label>
               <input
                 type="password"
                 name="confirmPassword"
@@ -128,7 +130,7 @@ export default function SignUpPage() {
 
             <label className="flex items-center gap-2 text-sm">
               <input type="checkbox" required className="rounded" />
-              <span>I agree to the Terms of Service and Privacy Policy</span>
+              <span>{t.auth.agreeTerms}</span>
             </label>
 
             <button
@@ -136,14 +138,14 @@ export default function SignUpPage() {
               disabled={isLoading}
               className="w-full bg-primary-600 text-white py-3 rounded-lg font-semibold hover:bg-primary-700 transition disabled:bg-gray-400"
             >
-              {isLoading ? 'Creating Account...' : 'Create Account'}
+              {isLoading ? t.auth.creatingAccount : t.auth.createAccount}
             </button>
           </form>
 
           <p className="text-center text-sm text-gray-600 mt-6">
-            Already have an account?{' '}
+            {t.auth.hasAccount}{' '}
             <Link href="/auth/signin" className="text-primary-600 hover:underline font-medium">
-              Sign in
+              {t.auth.signIn}
             </Link>
           </p>
         </div>

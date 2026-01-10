@@ -2,6 +2,9 @@ import { prisma } from '@/lib/prisma'
 import ProductCard from '@/components/products/ProductCard'
 import ProductFilters from '@/components/products/ProductFilters'
 import SortSelector from '@/components/products/SortSelector'
+import Pagination from '@/components/ui/Pagination'
+import ProductsHeader from '@/components/products/ProductsHeader'
+import NoProductsFound from '@/components/products/NoProductsFound'
 
 interface SearchParams {
   category?: string
@@ -89,16 +92,13 @@ export default async function ProductsPage({
         <div className="flex-grow">
           {/* Header */}
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-            <div>
-              <h1 className="text-2xl font-bold">
-                {searchParams.category
-                  ? categories.find((c) => c.slug === searchParams.category)?.name || 'Products'
-                  : searchParams.search
-                  ? `Search: "${searchParams.search}"`
-                  : 'All Products'}
-              </h1>
-              <p className="text-gray-500">{total} products found</p>
-            </div>
+            <ProductsHeader 
+              categoryName={searchParams.category 
+                ? categories.find((c) => c.slug === searchParams.category)?.name 
+                : null}
+              searchQuery={searchParams.search}
+              total={total}
+            />
 
             {/* Sort */}
             <SortSelector />
@@ -114,31 +114,10 @@ export default async function ProductsPage({
               </div>
 
               {/* Pagination */}
-              {totalPages > 1 && (
-                <div className="mt-8 flex justify-center gap-2">
-                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
-                    <a
-                      key={p}
-                      href={`?page=${p}${searchParams.category ? `&category=${searchParams.category}` : ''}${searchParams.sort ? `&sort=${searchParams.sort}` : ''}`}
-                      className={`px-4 py-2 rounded-lg ${
-                        p === page
-                          ? 'bg-primary-600 text-white'
-                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                      }`}
-                    >
-                      {p}
-                    </a>
-                  ))}
-                </div>
-              )}
+              <Pagination currentPage={page} totalPages={totalPages} />
             </>
           ) : (
-            <div className="text-center py-12">
-              <p className="text-gray-500 text-lg">No products found</p>
-              <a href="/products" className="text-primary-600 hover:underline mt-2 inline-block">
-                View all products
-              </a>
-            </div>
+            <NoProductsFound />
           )}
         </div>
       </div>

@@ -4,11 +4,13 @@ import { useState } from 'react'
 import { signIn } from 'next-auth/react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
+import { useTranslation } from '@/lib/i18n/context'
 
 export default function SignInPage() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const callbackUrl = searchParams.get('callbackUrl') || '/'
+  const { t } = useTranslation()
   
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -44,7 +46,7 @@ export default function SignInPage() {
     <div className="min-h-[80vh] flex items-center justify-center px-4">
       <div className="w-full max-w-md">
         <div className="bg-white rounded-lg shadow-sm p-8">
-          <h1 className="text-2xl font-bold text-center mb-6">Sign In</h1>
+          <h1 className="text-2xl font-bold text-center mb-6">{t.auth.signIn}</h1>
 
           {error && (
             <div className="bg-red-50 text-red-600 p-3 rounded-lg mb-4 text-sm">
@@ -54,7 +56,7 @@ export default function SignInPage() {
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium mb-1">Email</label>
+              <label className="block text-sm font-medium mb-1">{t.auth.email}</label>
               <input
                 type="email"
                 value={email}
@@ -66,7 +68,7 @@ export default function SignInPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-1">Password</label>
+              <label className="block text-sm font-medium mb-1">{t.auth.password}</label>
               <input
                 type="password"
                 value={password}
@@ -80,10 +82,10 @@ export default function SignInPage() {
             <div className="flex items-center justify-between text-sm">
               <label className="flex items-center gap-2">
                 <input type="checkbox" className="rounded" />
-                <span>Remember me</span>
+                <span>{t.auth.rememberMe}</span>
               </label>
               <Link href="/auth/forgot-password" className="text-primary-600 hover:underline">
-                Forgot password?
+                {t.auth.forgotPassword}
               </Link>
             </div>
 
@@ -92,13 +94,13 @@ export default function SignInPage() {
               disabled={isLoading}
               className="w-full bg-primary-600 text-white py-3 rounded-lg font-semibold hover:bg-primary-700 transition disabled:bg-gray-400"
             >
-              {isLoading ? 'Signing in...' : 'Sign In'}
+              {isLoading ? t.auth.signingIn : t.auth.signIn}
             </button>
           </form>
 
           <div className="my-6 flex items-center">
             <div className="flex-grow border-t border-gray-300"></div>
-            <span className="px-4 text-gray-500 text-sm">or continue with</span>
+            <span className="px-4 text-gray-500 text-sm">{t.auth.orContinueWith}</span>
             <div className="flex-grow border-t border-gray-300"></div>
           </div>
 
@@ -113,14 +115,14 @@ export default function SignInPage() {
                 <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
                 <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
               </svg>
-              <span>Continue with Google</span>
+              <span>{t.auth.signInWithGoogle}</span>
             </button>
           </div>
 
           <p className="text-center text-sm text-gray-600 mt-6">
-            Don&apos;t have an account?{' '}
+            {t.auth.noAccount}{' '}
             <Link href="/auth/signup" className="text-primary-600 hover:underline font-medium">
-              Sign up
+              {t.auth.signUp}
             </Link>
           </p>
         </div>

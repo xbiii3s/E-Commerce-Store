@@ -1,11 +1,13 @@
 'use client'
 
-import Image from 'next/image'
 import Link from 'next/link'
 import { useCart } from '@/components/providers/CartProvider'
+import { useTranslation } from '@/lib/i18n/context'
+import ProductImage from '@/components/ui/ProductImage'
 
 export default function CartPage() {
   const { items, itemCount, subtotal, updateQuantity, removeItem, clearCart } = useCart()
+  const { t } = useTranslation()
 
   const shipping = subtotal >= 50 ? 0 : 9.99
   const tax = subtotal * 0.1 // 10% tax
@@ -18,13 +20,13 @@ export default function CartPage() {
           <svg className="w-24 h-24 mx-auto text-gray-300 mb-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
           </svg>
-          <h1 className="text-2xl font-bold mb-4">Your cart is empty</h1>
-          <p className="text-gray-500 mb-8">Looks like you haven't added anything to your cart yet.</p>
+          <h1 className="text-2xl font-bold mb-4">{t.cart.empty}</h1>
+          <p className="text-gray-500 mb-8">{t.cart.emptyDesc}</p>
           <Link
             href="/products"
             className="inline-block bg-primary-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-primary-700 transition"
           >
-            Start Shopping
+            {t.cart.startShopping}
           </Link>
         </div>
       </div>
@@ -33,7 +35,7 @@ export default function CartPage() {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-8">Shopping Cart ({itemCount} items)</h1>
+      <h1 className="text-3xl font-bold mb-8">{t.cart.title} ({itemCount} {t.cart.items})</h1>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Cart Items */}
@@ -46,8 +48,8 @@ export default function CartPage() {
               >
                 {/* Image */}
                 <div className="w-24 h-24 relative bg-gray-100 rounded-lg overflow-hidden shrink-0">
-                  <Image
-                    src={item.image || 'https://via.placeholder.com/100x100?text=No+Image'}
+                  <ProductImage
+                    src={item.image || `https://picsum.photos/seed/${item.name.length * 7}/100/100`}
                     alt={item.name}
                     fill
                     className="object-cover"
@@ -82,7 +84,7 @@ export default function CartPage() {
                       onClick={() => removeItem(item.id)}
                       className="text-red-500 hover:text-red-600 text-sm"
                     >
-                      Remove
+                      {t.cart.remove}
                     </button>
                   </div>
                 </div>
@@ -101,13 +103,13 @@ export default function CartPage() {
               href="/products"
               className="text-primary-600 hover:text-primary-700 font-medium flex items-center gap-1"
             >
-              ← Continue Shopping
+              ← {t.cart.continueShopping}
             </Link>
             <button
               onClick={clearCart}
               className="text-red-500 hover:text-red-600 font-medium"
             >
-              Clear Cart
+              {t.cart.clearCart}
             </button>
           </div>
         </div>
@@ -115,28 +117,28 @@ export default function CartPage() {
         {/* Order Summary */}
         <div className="lg:col-span-1">
           <div className="bg-white rounded-lg shadow-sm p-6 sticky top-24">
-            <h2 className="text-xl font-bold mb-4">Order Summary</h2>
+            <h2 className="text-xl font-bold mb-4">{t.cart.orderSummary}</h2>
 
             <div className="space-y-3 text-sm">
               <div className="flex justify-between">
-                <span className="text-gray-600">Subtotal</span>
+                <span className="text-gray-600">{t.cart.subtotal}</span>
                 <span>${subtotal.toFixed(2)}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-600">Shipping</span>
-                <span>{shipping === 0 ? 'FREE' : `$${shipping.toFixed(2)}`}</span>
+                <span className="text-gray-600">{t.cart.shipping}</span>
+                <span>{shipping === 0 ? t.cart.free : `$${shipping.toFixed(2)}`}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-600">Tax (10%)</span>
+                <span className="text-gray-600">{t.cart.tax} (10%)</span>
                 <span>${tax.toFixed(2)}</span>
               </div>
               {subtotal < 50 && (
                 <p className="text-xs text-gray-500 bg-gray-50 p-2 rounded">
-                  Add ${(50 - subtotal).toFixed(2)} more for free shipping!
+                  {t.cart.freeShippingNote.replace('${amount}', (50 - subtotal).toFixed(2))}
                 </p>
               )}
               <div className="border-t pt-3 flex justify-between font-bold text-lg">
-                <span>Total</span>
+                <span>{t.cart.total}</span>
                 <span className="text-primary-600">${total.toFixed(2)}</span>
               </div>
             </div>
@@ -145,7 +147,7 @@ export default function CartPage() {
               href="/checkout"
               className="mt-6 block w-full bg-primary-600 text-white text-center py-3 rounded-lg font-semibold hover:bg-primary-700 transition"
             >
-              Proceed to Checkout
+              {t.cart.proceedToCheckout}
             </Link>
 
             {/* Payment Methods */}
