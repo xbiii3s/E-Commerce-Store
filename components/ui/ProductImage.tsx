@@ -44,7 +44,8 @@ export default function ProductImage({
     setIsLoading(false)
   }
 
-  // 检查是否是本地上传的图片或 data URI
+  // 检查是否需要跳过图片优化（data URI 或本地上传）
+  // Vercel Blob 图片可以正常优化
   const needsUnoptimized = imgSrc.startsWith('data:') || imgSrc.startsWith('/uploads/')
 
   if (fill) {
