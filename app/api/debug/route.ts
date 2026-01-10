@@ -6,6 +6,8 @@ export async function GET() {
   try {
     // 检查环境变量是否存在（不暴露具体值）
     const envCheck = {
+      PRISMA_DATABASE_URL: !!process.env.PRISMA_DATABASE_URL,
+      POSTGRES_URL: !!process.env.POSTGRES_URL,
       DATABASE_URL: !!process.env.DATABASE_URL,
       DIRECT_URL: !!process.env.DIRECT_URL,
       NEXTAUTH_SECRET: !!process.env.NEXTAUTH_SECRET,
