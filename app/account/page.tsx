@@ -4,17 +4,24 @@ import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import AccountClient from '@/components/account/AccountClient'
 
+export const dynamic = 'force-dynamic'
+
 async function getUserWithOrders(email: string) {
-  const user = await prisma.user.findUnique({
-    where: { email },
-    include: {
-      orders: {
-        include: { items: true },
-        orderBy: { createdAt: 'desc' },
+  try {
+    const user = await prisma.user.findUnique({
+      where: { email },
+      include: {
+        orders: {
+          include: { items: true },
+          orderBy: { createdAt: 'desc' },
+        },
       },
-    },
-  })
-  return user
+    })
+    return user
+  } catch (error) {
+    console.error('Error fetching user:', error)
+    return null
+  }
 }
 
 export default async function AccountPage() {

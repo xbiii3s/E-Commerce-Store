@@ -1,16 +1,23 @@
 import { prisma } from '@/lib/prisma'
 import CategoryManager from '@/components/admin/CategoryManager'
 
+export const dynamic = 'force-dynamic'
+
 async function getCategories() {
-  const categories = await prisma.category.findMany({
-    include: {
-      _count: {
-        select: { products: true },
+  try {
+    const categories = await prisma.category.findMany({
+      include: {
+        _count: {
+          select: { products: true },
+        },
       },
-    },
-    orderBy: { name: 'asc' },
-  })
-  return categories
+      orderBy: { name: 'asc' },
+    })
+    return categories
+  } catch (error) {
+    console.error('Error fetching categories:', error)
+    return []
+  }
 }
 
 export default async function AdminCategoriesPage() {

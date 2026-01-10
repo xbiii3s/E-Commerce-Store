@@ -3,60 +3,73 @@ import Link from 'next/link'
 import OrderStatusBadge from '@/components/admin/OrderStatusBadge'
 import OrderActions from '@/components/admin/OrderActions'
 
+export const dynamic = 'force-dynamic'
+
 async function getOrders(searchParams: { page?: string; status?: string; search?: string }) {
-  const page = parseInt(searchParams.page || '1')
-  const limit = 15
-  const skip = (page - 1) * limit
+  try {
+    const page = parseInt(searchParams.page || '1')
+    const limit = 15
+    const skip = (page - 1) * limit
 
-  const where: any = {}
-  
-  if (searchParams.status && searchParams.status !== 'all') {
-    where.status = searchParams.status
-  }
+    const where: any = {}
+    
+    if (searchParams.status && searchParams.status !== 'all') {
+      where.status = searchParams.status
+    }
 
-  if (searchParams.search) {
-    where.OR = [
-      { id: { contains: searchParams.search } },
-      { user: { email: { contains: searchParams.search } } },
-      { user: { name: { contains: searchParams.search } } },
-    ]
-  }
+    if (searchParams.search) {
+      where.OR = [
+        { id: { contains: searchParams.search } },
+        { user: { email: { contains: searchParams.search } } },
+        { user: { name: { contains: searchParams.search } } },
+      ]
+    }
 
-  const [orders, total, statusCounts] = await Promise.all([
-    prisma.order.findMany({
-      where,
-      include: {
-        user: { select: { name: true, email: true } },
-        items: { 
-          include: { product: { select: { name: true } } },
-          take: 3,
+    const [orders, total, statusCounts] = await Promise.all([
+      prisma.order.findMany({
+        where,
+        include: {
+          user: { select: { name: true, email: true } },
+          items: { 
+            include: { product: { select: { name: true } } },
+            take: 3,
+          },
+          _count: { select: { items: true } },
         },
-        _count: { select: { items: true } },
-      },
-      orderBy: { createdAt: 'desc' },
-      skip,
-      take: limit,
-    }),
-    prisma.order.count({ where }),
-    prisma.order.groupBy({
-      by: ['status'],
-      _count: true,
-    }),
-  ])
+        orderBy: { createdAt: 'desc' },
+        skip,
+        take: limit,
+      }),
+      prisma.order.count({ where }),
+      prisma.order.groupBy({
+        by: ['status'],
+        _count: true,
+      }),
+    ])
 
-  const counts = {
-    all: await prisma.order.count(),
-    pending: 0,
-    processing: 0,
-    shipped: 0,
-    delivered: 0,
-    cancelled: 0,
+    const counts = {
+      all: await prisma.order.count(),
+      pending: 0,
+      processing: 0,
+      shipped: 0,
+      delivered: 0,
+      cancelled: 0,
+    }
+    statusCounts.forEach((s) => {
+      counts[s.status as keyof typeof counts] = s._count
+    })
+
+    return { orders, total, page, totalPages: Math.ceil(total / limit), counts }
+  } catch (error) {
+    console.error('Error fetching orders:', error)
+    return { 
+      orders: [], 
+      total: 0, 
+      page: 1, 
+      totalPages: 0, 
+      counts: { all: 0, pending: 0, processing: 0, shipped: 0, delivered: 0, cancelled: 0 } 
+    }
   }
-  statusCounts.forEach((s) => {
-    counts[s.status as keyof typeof counts] = s._count
-  })
-
-  return { orders, total, page, totalPages: Math.ceil(total / limit), counts }
 }
 
 export default async function AdminOrdersPage({

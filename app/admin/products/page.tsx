@@ -3,37 +3,44 @@ import Link from 'next/link'
 import Image from 'next/image'
 import ProductActions from '@/components/admin/ProductActions'
 
+export const dynamic = 'force-dynamic'
+
 async function getProducts(searchParams: { page?: string; search?: string; category?: string }) {
-  const page = parseInt(searchParams.page || '1')
-  const limit = 10
-  const skip = (page - 1) * limit
+  try {
+    const page = parseInt(searchParams.page || '1')
+    const limit = 10
+    const skip = (page - 1) * limit
 
-  const where: any = {}
-  
-  if (searchParams.search) {
-    where.OR = [
-      { name: { contains: searchParams.search } },
-      { description: { contains: searchParams.search } },
-    ]
+    const where: any = {}
+    
+    if (searchParams.search) {
+      where.OR = [
+        { name: { contains: searchParams.search } },
+        { description: { contains: searchParams.search } },
+      ]
+    }
+
+    if (searchParams.category) {
+      where.categoryId = searchParams.category
+    }
+
+    const [products, total, categories] = await Promise.all([
+      prisma.product.findMany({
+        where,
+        include: { category: true },
+        orderBy: { createdAt: 'desc' },
+        skip,
+        take: limit,
+      }),
+      prisma.product.count({ where }),
+      prisma.category.findMany({ orderBy: { name: 'asc' } }),
+    ])
+
+    return { products, total, categories, page, totalPages: Math.ceil(total / limit) }
+  } catch (error) {
+    console.error('Error fetching products:', error)
+    return { products: [], total: 0, categories: [], page: 1, totalPages: 0 }
   }
-
-  if (searchParams.category) {
-    where.categoryId = searchParams.category
-  }
-
-  const [products, total, categories] = await Promise.all([
-    prisma.product.findMany({
-      where,
-      include: { category: true },
-      orderBy: { createdAt: 'desc' },
-      skip,
-      take: limit,
-    }),
-    prisma.product.count({ where }),
-    prisma.category.findMany({ orderBy: { name: 'asc' } }),
-  ])
-
-  return { products, total, categories, page, totalPages: Math.ceil(total / limit) }
 }
 
 export default async function AdminProductsPage({

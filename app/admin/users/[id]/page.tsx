@@ -4,29 +4,36 @@ import Link from 'next/link'
 import UserRoleUpdater from '@/components/admin/UserRoleUpdater'
 import OrderStatusBadge from '@/components/admin/OrderStatusBadge'
 
+export const dynamic = 'force-dynamic'
+
 async function getUser(id: string) {
-  const user = await prisma.user.findUnique({
-    where: { id },
-    include: {
-      orders: {
-        include: {
-          _count: { select: { items: true } },
+  try {
+    const user = await prisma.user.findUnique({
+      where: { id },
+      include: {
+        orders: {
+          include: {
+            _count: { select: { items: true } },
+          },
+          orderBy: { createdAt: 'desc' },
+          take: 10,
         },
-        orderBy: { createdAt: 'desc' },
-        take: 10,
-      },
-      wishlist: {
-        include: {
-          product: { select: { id: true, name: true, slug: true, price: true } },
+        wishlist: {
+          include: {
+            product: { select: { id: true, name: true, slug: true, price: true } },
+          },
+          take: 10,
         },
-        take: 10,
+        _count: {
+          select: { orders: true, wishlist: true },
+        },
       },
-      _count: {
-        select: { orders: true, wishlist: true },
-      },
-    },
-  })
-  return user
+    })
+    return user
+  } catch (error) {
+    console.error('Error fetching user:', error)
+    return null
+  }
 }
 
 export default async function UserDetailPage({

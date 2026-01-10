@@ -4,11 +4,18 @@ import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import Link from 'next/link'
 
+export const dynamic = 'force-dynamic'
+
 async function getUserOrders(userId: string) {
-  return prisma.order.findMany({
-    where: { userId },
-    orderBy: { createdAt: 'desc' },
-  })
+  try {
+    return await prisma.order.findMany({
+      where: { userId },
+      orderBy: { createdAt: 'desc' },
+    })
+  } catch (error) {
+    console.error('Error fetching user orders:', error)
+    return []
+  }
 }
 
 export default async function OrdersPage() {

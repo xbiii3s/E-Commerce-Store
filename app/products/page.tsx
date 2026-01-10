@@ -6,6 +6,8 @@ import Pagination from '@/components/ui/Pagination'
 import ProductsHeader from '@/components/products/ProductsHeader'
 import NoProductsFound from '@/components/products/NoProductsFound'
 
+export const dynamic = 'force-dynamic'
+
 interface SearchParams {
   category?: string
   search?: string
@@ -17,57 +19,67 @@ interface SearchParams {
 }
 
 async function getProducts(searchParams: SearchParams) {
-  const where: any = { active: true }
+  try {
+    const where: any = { active: true }
 
-  if (searchParams.category) {
-    where.category = { slug: searchParams.category }
+    if (searchParams.category) {
+      where.category = { slug: searchParams.category }
+    }
+
+    if (searchParams.search) {
+      where.OR = [
+        { name: { contains: searchParams.search } },
+        { description: { contains: searchParams.search } },
+      ]
+    }
+
+    if (searchParams.featured === 'true') {
+      where.featured = true
+    }
+
+    if (searchParams.minPrice) {
+      where.price = { ...where.price, gte: parseFloat(searchParams.minPrice) }
+    }
+
+    if (searchParams.maxPrice) {
+      where.price = { ...where.price, lte: parseFloat(searchParams.maxPrice) }
+    }
+
+    let orderBy: any = { createdAt: 'desc' }
+    if (searchParams.sort === 'price-asc') orderBy = { price: 'asc' }
+    if (searchParams.sort === 'price-desc') orderBy = { price: 'desc' }
+    if (searchParams.sort === 'name') orderBy = { name: 'asc' }
+
+    const page = parseInt(searchParams.page || '1')
+    const pageSize = 12
+
+    const [products, total] = await Promise.all([
+      prisma.product.findMany({
+        where,
+        include: { category: true },
+        orderBy,
+        skip: (page - 1) * pageSize,
+        take: pageSize,
+      }),
+      prisma.product.count({ where }),
+    ])
+
+    return { products, total, page, pageSize, totalPages: Math.ceil(total / pageSize) }
+  } catch (error) {
+    console.error('Error fetching products:', error)
+    return { products: [], total: 0, page: 1, pageSize: 12, totalPages: 0 }
   }
-
-  if (searchParams.search) {
-    where.OR = [
-      { name: { contains: searchParams.search } },
-      { description: { contains: searchParams.search } },
-    ]
-  }
-
-  if (searchParams.featured === 'true') {
-    where.featured = true
-  }
-
-  if (searchParams.minPrice) {
-    where.price = { ...where.price, gte: parseFloat(searchParams.minPrice) }
-  }
-
-  if (searchParams.maxPrice) {
-    where.price = { ...where.price, lte: parseFloat(searchParams.maxPrice) }
-  }
-
-  let orderBy: any = { createdAt: 'desc' }
-  if (searchParams.sort === 'price-asc') orderBy = { price: 'asc' }
-  if (searchParams.sort === 'price-desc') orderBy = { price: 'desc' }
-  if (searchParams.sort === 'name') orderBy = { name: 'asc' }
-
-  const page = parseInt(searchParams.page || '1')
-  const pageSize = 12
-
-  const [products, total] = await Promise.all([
-    prisma.product.findMany({
-      where,
-      include: { category: true },
-      orderBy,
-      skip: (page - 1) * pageSize,
-      take: pageSize,
-    }),
-    prisma.product.count({ where }),
-  ])
-
-  return { products, total, page, pageSize, totalPages: Math.ceil(total / pageSize) }
 }
 
 async function getCategories() {
-  return prisma.category.findMany({
-    include: { _count: { select: { products: true } } },
-  })
+  try {
+    return await prisma.category.findMany({
+      include: { _count: { select: { products: true } } },
+    })
+  } catch (error) {
+    console.error('Error fetching categories:', error)
+    return []
+  }
 }
 
 export default async function ProductsPage({

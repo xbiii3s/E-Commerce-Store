@@ -4,19 +4,26 @@ import Link from 'next/link'
 import OrderStatusBadge from '@/components/admin/OrderStatusBadge'
 import OrderStatusUpdater from '@/components/admin/OrderStatusUpdater'
 
+export const dynamic = 'force-dynamic'
+
 async function getOrder(id: string) {
-  const order = await prisma.order.findUnique({
-    where: { id },
-    include: {
-      user: { select: { id: true, name: true, email: true } },
-      items: {
-        include: {
-          product: { select: { id: true, name: true, slug: true, images: true } },
+  try {
+    const order = await prisma.order.findUnique({
+      where: { id },
+      include: {
+        user: { select: { id: true, name: true, email: true } },
+        items: {
+          include: {
+            product: { select: { id: true, name: true, slug: true, images: true } },
+          },
         },
       },
-    },
-  })
-  return order
+    })
+    return order
+  } catch (error) {
+    console.error('Error fetching order:', error)
+    return null
+  }
 }
 
 export default async function OrderDetailPage({

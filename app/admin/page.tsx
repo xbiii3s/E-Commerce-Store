@@ -1,45 +1,59 @@
 import { prisma } from '@/lib/prisma'
 import Link from 'next/link'
 
-async function getStats() {
-  const [
-    totalProducts,
-    totalOrders,
-    totalUsers,
-    totalRevenue,
-    recentOrders,
-    lowStockProducts,
-  ] = await Promise.all([
-    prisma.product.count(),
-    prisma.order.count(),
-    prisma.user.count(),
-    prisma.order.aggregate({
-      _sum: { total: true },
-      where: { status: { not: 'cancelled' } },
-    }),
-    prisma.order.findMany({
-      take: 5,
-      orderBy: { createdAt: 'desc' },
-      include: {
-        user: { select: { name: true, email: true } },
-        items: { include: { product: { select: { name: true } } } },
-      },
-    }),
-    prisma.product.findMany({
-      where: { inventory: { lt: 10 } },
-      take: 5,
-      orderBy: { inventory: 'asc' },
-      select: { id: true, name: true, inventory: true, slug: true },
-    }),
-  ])
+export const dynamic = 'force-dynamic'
 
-  return {
-    totalProducts,
-    totalOrders,
-    totalUsers,
-    totalRevenue: totalRevenue._sum.total || 0,
-    recentOrders,
-    lowStockProducts,
+async function getStats() {
+  try {
+    const [
+      totalProducts,
+      totalOrders,
+      totalUsers,
+      totalRevenue,
+      recentOrders,
+      lowStockProducts,
+    ] = await Promise.all([
+      prisma.product.count(),
+      prisma.order.count(),
+      prisma.user.count(),
+      prisma.order.aggregate({
+        _sum: { total: true },
+        where: { status: { not: 'cancelled' } },
+      }),
+      prisma.order.findMany({
+        take: 5,
+        orderBy: { createdAt: 'desc' },
+        include: {
+          user: { select: { name: true, email: true } },
+          items: { include: { product: { select: { name: true } } } },
+        },
+      }),
+      prisma.product.findMany({
+        where: { inventory: { lt: 10 } },
+        take: 5,
+        orderBy: { inventory: 'asc' },
+        select: { id: true, name: true, inventory: true, slug: true },
+      }),
+    ])
+
+    return {
+      totalProducts,
+      totalOrders,
+      totalUsers,
+      totalRevenue: totalRevenue._sum.total || 0,
+      recentOrders,
+      lowStockProducts,
+    }
+  } catch (error) {
+    console.error('Error fetching stats:', error)
+    return {
+      totalProducts: 0,
+      totalOrders: 0,
+      totalUsers: 0,
+      totalRevenue: 0,
+      recentOrders: [],
+      lowStockProducts: [],
+    }
   }
 }
 

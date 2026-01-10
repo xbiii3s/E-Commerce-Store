@@ -1,55 +1,62 @@
 import { prisma } from '@/lib/prisma'
 import Link from 'next/link'
 
+export const dynamic = 'force-dynamic'
+
 async function getUsers(searchParams: { page?: string; role?: string; search?: string }) {
-  const page = parseInt(searchParams.page || '1')
-  const limit = 20
-  const skip = (page - 1) * limit
+  try {
+    const page = parseInt(searchParams.page || '1')
+    const limit = 20
+    const skip = (page - 1) * limit
 
-  const where: any = {}
+    const where: any = {}
 
-  if (searchParams.role && searchParams.role !== 'all') {
-    where.role = searchParams.role
-  }
+    if (searchParams.role && searchParams.role !== 'all') {
+      where.role = searchParams.role
+    }
 
-  if (searchParams.search) {
-    where.OR = [
-      { email: { contains: searchParams.search } },
-      { name: { contains: searchParams.search } },
-    ]
-  }
+    if (searchParams.search) {
+      where.OR = [
+        { email: { contains: searchParams.search } },
+        { name: { contains: searchParams.search } },
+      ]
+    }
 
-  const [users, total] = await Promise.all([
-    prisma.user.findMany({
-      where,
-      select: {
-        id: true,
-        email: true,
-        name: true,
-        role: true,
-        createdAt: true,
-        _count: {
-          select: { orders: true },
+    const [users, total] = await Promise.all([
+      prisma.user.findMany({
+        where,
+        select: {
+          id: true,
+          email: true,
+          name: true,
+          role: true,
+          createdAt: true,
+          _count: {
+            select: { orders: true },
+          },
+          orders: {
+            select: { total: true },
+            orderBy: { createdAt: 'desc' },
+          },
         },
-        orders: {
-          select: { total: true },
-          orderBy: { createdAt: 'desc' },
-        },
-      },
-      orderBy: { createdAt: 'desc' },
-      skip,
-      take: limit,
-    }),
-    prisma.user.count({ where }),
-  ])
+        orderBy: { createdAt: 'desc' },
+        skip,
+        take: limit,
+      }),
+      prisma.user.count({ where }),
+    ])
 
-  const usersWithStats = users.map((user) => ({
-    ...user,
-    orderCount: user._count.orders,
-    totalSpent: user.orders.reduce((sum, order) => sum + order.total, 0),
-  }))
+    const usersWithStats = users.map((user) => ({
+      ...user,
+      orderCount: user._count.orders,
+      totalSpent: user.orders.reduce((sum, order) => sum + order.total, 0),
+    }))
 
-  return { users: usersWithStats, total, page, totalPages: Math.ceil(total / limit) }
+    return { users: usersWithStats, total, page, totalPages: Math.ceil(total / limit) }
+  } catch (error) {
+    console.error('Error fetching users:', error)
+    return { users: [], total: 0, page: 1, totalPages: 0 }
+  }
 }
 
 export default async function AdminUsersPage({

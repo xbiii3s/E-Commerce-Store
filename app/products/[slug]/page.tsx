@@ -2,6 +2,8 @@ import { notFound } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
 import ProductDetailClient from '@/components/products/ProductDetailClient'
 
+export const dynamic = 'force-dynamic'
+
 // 根据产品名生成 picsum 图片 URL
 function getProductImage(images: string, productName: string): string {
   const parsed = JSON.parse(images || '[]')
