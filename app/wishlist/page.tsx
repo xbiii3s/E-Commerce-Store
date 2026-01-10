@@ -111,6 +111,19 @@ export default function WishlistPage() {
     )
   }
 
+  // 解析商品图片
+  const getProductImage = (images: string | string[]): string => {
+    try {
+      const parsed = typeof images === 'string' ? JSON.parse(images) : images
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        return parsed[0]
+      }
+    } catch (e) {
+      console.error('Failed to parse images:', e)
+    }
+    return 'https://picsum.photos/400/400'
+  }
+
   // 收藏列表
   return (
     <div className="container mx-auto px-4 py-8">
@@ -125,10 +138,11 @@ export default function WishlistPage() {
             <Link href={`/products/${item.product.slug}`}>
               <div className="aspect-square relative bg-gray-100">
                 <Image
-                  src={item.product.images?.[0] || '/placeholder.svg'}
+                  src={getProductImage(item.product.images)}
                   alt={item.product.name}
                   fill
                   className="object-cover group-hover:scale-105 transition-transform duration-300"
+                  unoptimized
                 />
                 {/* 移除按钮 */}
                 <button
