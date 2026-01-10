@@ -31,10 +31,10 @@ export default function WishlistPage() {
   const handleAddToCart = async (product: any) => {
     setAddingToCartId(product.id)
     // 解析 images JSON 字符串
-    let imageUrl = '/placeholder.jpg'
+    let imageUrl = '/placeholder.svg'
     try {
       const images = typeof product.images === 'string' ? JSON.parse(product.images) : product.images
-      imageUrl = images?.[0] || '/placeholder.jpg'
+      imageUrl = images?.[0] || '/placeholder.svg'
     } catch (e) {
       console.error('Failed to parse images:', e)
     }
@@ -125,7 +125,7 @@ export default function WishlistPage() {
             <Link href={`/products/${item.product.slug}`}>
               <div className="aspect-square relative bg-gray-100">
                 <Image
-                  src={item.product.images?.[0] || '/placeholder.jpg'}
+                  src={item.product.images?.[0] || '/placeholder.svg'}
                   alt={item.product.name}
                   fill
                   className="object-cover group-hover:scale-105 transition-transform duration-300"

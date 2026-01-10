@@ -71,6 +71,7 @@ export const translations = {
       description: 'Description',
       relatedProducts: 'Related Products',
       customerReviews: 'Customer Reviews',
+      productDetails: 'Product Details',
       filters: 'Filters',
       clearAll: 'Clear all',
       category: 'Category',
@@ -294,6 +295,7 @@ export const translations = {
       description: '商品描述',
       relatedProducts: '相关商品',
       customerReviews: '用户评价',
+      productDetails: '商品详情',
       filters: '筛选',
       clearAll: '清除全部',
       category: '分类',
@@ -511,6 +513,7 @@ export type TranslationKeys = {
     description: string
     relatedProducts: string
     customerReviews: string
+    productDetails: string
     filters: string
     clearAll: string
     category: string

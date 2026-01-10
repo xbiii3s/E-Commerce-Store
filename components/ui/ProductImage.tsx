@@ -1,7 +1,7 @@
 'use client'
 
 import Image from 'next/image'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 interface ProductImageProps {
   src: string
@@ -29,6 +29,12 @@ export default function ProductImage({
 }: ProductImageProps) {
   const [imgSrc, setImgSrc] = useState(src || placeholderSvg)
   const [isLoading, setIsLoading] = useState(true)
+  
+  // 当 src 变化时更新 imgSrc
+  useEffect(() => {
+    setImgSrc(src || placeholderSvg)
+    setIsLoading(true)
+  }, [src])
 
   const handleError = () => {
     setImgSrc(placeholderSvg)
@@ -37,6 +43,9 @@ export default function ProductImage({
   const handleLoad = () => {
     setIsLoading(false)
   }
+
+  // 检查是否是本地上传的图片或 data URI
+  const needsUnoptimized = imgSrc.startsWith('data:') || imgSrc.startsWith('/uploads/')
 
   if (fill) {
     return (
@@ -53,7 +62,7 @@ export default function ProductImage({
           onError={handleError}
           onLoad={handleLoad}
           priority={priority}
-          unoptimized={imgSrc.startsWith('data:')}
+          unoptimized={needsUnoptimized}
         />
       </>
     )
@@ -76,7 +85,7 @@ export default function ProductImage({
         onError={handleError}
         onLoad={handleLoad}
         priority={priority}
-        unoptimized={imgSrc.startsWith('data:')}
+        unoptimized={needsUnoptimized}
       />
     </>
   )

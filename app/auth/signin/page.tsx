@@ -1,10 +1,29 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { signIn } from 'next-auth/react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { useTranslation } from '@/lib/i18n/context'
+
+// 简单的加密/解密函数（用于基本保护，不是真正的安全加密）
+const encode = (str: string) => {
+  try {
+    return btoa(encodeURIComponent(str))
+  } catch {
+    return ''
+  }
+}
+
+const decode = (str: string) => {
+  try {
+    return decodeURIComponent(atob(str))
+  } catch {
+    return ''
+  }
+}
+
+const REMEMBER_KEY = 'estore_remember_credentials'
 
 export default function SignInPage() {
   const router = useRouter()
@@ -14,8 +33,26 @@ export default function SignInPage() {
   
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [rememberMe, setRememberMe] = useState(false)
   const [error, setError] = useState('')
   const [isLoading, setIsLoading] = useState(false)
+
+  // 页面加载时读取保存的凭据
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(REMEMBER_KEY)
+      if (saved) {
+        const { email: savedEmail, password: savedPassword } = JSON.parse(saved)
+        if (savedEmail && savedPassword) {
+          setEmail(decode(savedEmail))
+          setPassword(decode(savedPassword))
+          setRememberMe(true)
+        }
+      }
+    } catch {
+      // 忽略解析错误
+    }
+  }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -32,6 +69,15 @@ export default function SignInPage() {
       if (result?.error) {
         setError(result.error)
       } else {
+        // 登录成功后保存或清除凭据
+        if (rememberMe) {
+          localStorage.setItem(REMEMBER_KEY, JSON.stringify({
+            email: encode(email),
+            password: encode(password),
+          }))
+        } else {
+          localStorage.removeItem(REMEMBER_KEY)
+        }
         router.push(callbackUrl)
         router.refresh()
       }
@@ -80,8 +126,13 @@ export default function SignInPage() {
             </div>
 
             <div className="flex items-center justify-between text-sm">
-              <label className="flex items-center gap-2">
-                <input type="checkbox" className="rounded" />
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input 
+                  type="checkbox" 
+                  className="rounded" 
+                  checked={rememberMe}
+                  onChange={(e) => setRememberMe(e.target.checked)}
+                />
                 <span>{t.auth.rememberMe}</span>
               </label>
               <Link href="/auth/forgot-password" className="text-primary-600 hover:underline">

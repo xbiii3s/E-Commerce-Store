@@ -4,18 +4,17 @@ import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import AccountClient from '@/components/account/AccountClient'
 
-async function getUserOrders(userId: string) {
-  return prisma.order.findMany({
-    where: { userId },
-    include: { items: true },
-    orderBy: { createdAt: 'desc' },
+async function getUserWithOrders(email: string) {
+  const user = await prisma.user.findUnique({
+    where: { email },
+    include: {
+      orders: {
+        include: { items: true },
+        orderBy: { createdAt: 'desc' },
+      },
+    },
   })
-}
-
-async function getUser(userId: string) {
-  return prisma.user.findUnique({
-    where: { id: userId },
-  })
+  return user
 }
 
 export default async function AccountPage() {
@@ -25,11 +24,7 @@ export default async function AccountPage() {
     redirect('/auth/signin')
   }
 
-  const userId = (session.user as any).id
-  const [user, orders] = await Promise.all([
-    getUser(userId),
-    getUserOrders(userId),
-  ])
+  const user = await getUserWithOrders(session.user.email)
 
   if (!user) {
     redirect('/auth/signin')
@@ -38,7 +33,7 @@ export default async function AccountPage() {
   return (
     <AccountClient 
       user={{ name: user.name, email: user.email }}
-      orders={orders}
+      orders={user.orders}
     />
   )
 }

@@ -5,6 +5,7 @@ import Link from 'next/link'
 import ProductImage from '@/components/ui/ProductImage'
 import AddToCartButton from '@/components/products/AddToCartButton'
 import ProductCard from '@/components/products/ProductCard'
+import { RichContentDisplay } from '@/components/admin/RichContentEditor'
 
 interface Review {
   id: string
@@ -24,6 +25,7 @@ interface Product {
   name: string
   slug: string
   description: string | null
+  content: string | null
   price: number
   comparePrice: number | null
   inventory: number
@@ -185,6 +187,16 @@ export default function ProductDetailClient({ product, relatedProducts, mainImag
           </div>
         </div>
       </div>
+
+      {/* Product Content Section */}
+      {product.content && (
+        <section className="mb-16">
+          <h2 className="text-2xl font-bold mb-6">{t.products.productDetails || '商品详情'}</h2>
+          <div className="bg-white rounded-lg shadow-sm p-8">
+            <RichContentDisplay content={product.content} />
+          </div>
+        </section>
+      )}
 
       {/* Reviews Section */}
       {product.reviews.length > 0 && (

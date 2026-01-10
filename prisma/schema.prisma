@@ -74,6 +74,7 @@ model Product {
   name        String
   slug        String    @unique
   description String?
+  content     String?   // 富文本内容 JSON，支持文字、图片、视频
   price       Float
   comparePrice Float?
   images      String    @default("[]")
