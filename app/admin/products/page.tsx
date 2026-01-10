@@ -1,11 +1,11 @@
+import { unstable_noStore as noStore } from 'next/cache'
 import { prisma } from '@/lib/prisma'
 import Link from 'next/link'
 import Image from 'next/image'
 import ProductActions from '@/components/admin/ProductActions'
 
-export const dynamic = 'force-dynamic'
-
 async function getProducts(searchParams: { page?: string; search?: string; category?: string }) {
+  noStore()
   try {
     const page = parseInt(searchParams.page || '1')
     const limit = 10

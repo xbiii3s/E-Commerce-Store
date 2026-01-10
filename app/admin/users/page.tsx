@@ -1,9 +1,9 @@
+import { unstable_noStore as noStore } from 'next/cache'
 import { prisma } from '@/lib/prisma'
 import Link from 'next/link'
 
-export const dynamic = 'force-dynamic'
-
 async function getUsers(searchParams: { page?: string; role?: string; search?: string }) {
+  noStore()
   try {
     const page = parseInt(searchParams.page || '1')
     const limit = 20

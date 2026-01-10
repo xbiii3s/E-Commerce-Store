@@ -1,12 +1,12 @@
+import { unstable_noStore as noStore } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import Link from 'next/link'
 
-export const dynamic = 'force-dynamic'
-
 async function getUserOrders(userId: string) {
+  noStore()
   try {
     return await prisma.order.findMany({
       where: { userId },

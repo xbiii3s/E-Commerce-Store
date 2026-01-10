@@ -1,12 +1,12 @@
+import { unstable_noStore as noStore } from 'next/cache'
 import { prisma } from '@/lib/prisma'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import OrderStatusBadge from '@/components/admin/OrderStatusBadge'
 import OrderStatusUpdater from '@/components/admin/OrderStatusUpdater'
 
-export const dynamic = 'force-dynamic'
-
 async function getOrder(id: string) {
+  noStore()
   try {
     const order = await prisma.order.findUnique({
       where: { id },

@@ -1,12 +1,12 @@
+import { unstable_noStore as noStore } from 'next/cache'
 import { prisma } from '@/lib/prisma'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import UserRoleUpdater from '@/components/admin/UserRoleUpdater'
 import OrderStatusBadge from '@/components/admin/OrderStatusBadge'
 
-export const dynamic = 'force-dynamic'
-
 async function getUser(id: string) {
+  noStore()
   try {
     const user = await prisma.user.findUnique({
       where: { id },

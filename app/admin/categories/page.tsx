@@ -1,9 +1,9 @@
+import { unstable_noStore as noStore } from 'next/cache'
 import { prisma } from '@/lib/prisma'
 import CategoryManager from '@/components/admin/CategoryManager'
 
-export const dynamic = 'force-dynamic'
-
 async function getCategories() {
+  noStore()
   try {
     const categories = await prisma.category.findMany({
       include: {

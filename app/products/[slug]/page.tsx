@@ -1,8 +1,7 @@
+import { unstable_noStore as noStore } from 'next/cache'
 import { notFound } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
 import ProductDetailClient from '@/components/products/ProductDetailClient'
-
-export const dynamic = 'force-dynamic'
 
 // 根据产品名生成 picsum 图片 URL
 function getProductImage(images: string, productName: string): string {
@@ -15,7 +14,7 @@ function getProductImage(images: string, productName: string): string {
 }
 
 async function getProduct(slug: string) {
-  if (!prisma) notFound()
+  noStore()
   try {
     const product = await prisma.product.findUnique({
       where: { slug },
@@ -38,7 +37,8 @@ async function getProduct(slug: string) {
 }
 
 async function getRelatedProducts(categoryId: string | null, productId: string) {
-  if (!prisma || !categoryId) return []
+  noStore()
+  if (!categoryId) return []
   try {
     return await prisma.product.findMany({
       where: {

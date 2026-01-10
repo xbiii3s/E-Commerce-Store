@@ -1,3 +1,4 @@
+import { unstable_noStore as noStore } from 'next/cache'
 import { prisma } from '@/lib/prisma'
 import ProductCard from '@/components/products/ProductCard'
 import ProductFilters from '@/components/products/ProductFilters'
@@ -5,8 +6,6 @@ import SortSelector from '@/components/products/SortSelector'
 import Pagination from '@/components/ui/Pagination'
 import ProductsHeader from '@/components/products/ProductsHeader'
 import NoProductsFound from '@/components/products/NoProductsFound'
-
-export const dynamic = 'force-dynamic'
 
 interface SearchParams {
   category?: string
@@ -19,6 +18,7 @@ interface SearchParams {
 }
 
 async function getProducts(searchParams: SearchParams) {
+  noStore()
   try {
     const where: any = { active: true }
 
@@ -72,6 +72,7 @@ async function getProducts(searchParams: SearchParams) {
 }
 
 async function getCategories() {
+  noStore()
   try {
     return await prisma.category.findMany({
       include: { _count: { select: { products: true } } },

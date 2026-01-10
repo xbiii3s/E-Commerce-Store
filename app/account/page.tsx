@@ -1,12 +1,12 @@
+import { unstable_noStore as noStore } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import AccountClient from '@/components/account/AccountClient'
 
-export const dynamic = 'force-dynamic'
-
 async function getUserWithOrders(email: string) {
+  noStore()
   try {
     const user = await prisma.user.findUnique({
       where: { email },

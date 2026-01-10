@@ -1,10 +1,9 @@
+import { unstable_noStore as noStore } from 'next/cache'
 import { prisma } from '@/lib/prisma'
 import ProductForm from '@/components/admin/ProductForm'
 
-export const dynamic = 'force-dynamic'
-
 async function getCategories() {
-  if (!prisma) return []
+  noStore()
   try {
     return await prisma.category.findMany({
       orderBy: { name: 'asc' },

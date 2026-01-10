@@ -1,11 +1,10 @@
+import { unstable_noStore as noStore } from 'next/cache'
 import { prisma } from '@/lib/prisma'
 import { notFound } from 'next/navigation'
 import ProductForm from '@/components/admin/ProductForm'
 
-export const dynamic = 'force-dynamic'
-
 async function getProduct(slug: string) {
-  if (!prisma) return null
+  noStore()
   try {
     const product = await prisma.product.findUnique({
       where: { slug },
@@ -19,7 +18,7 @@ async function getProduct(slug: string) {
 }
 
 async function getCategories() {
-  if (!prisma) return []
+  noStore()
   try {
     return await prisma.category.findMany({
       orderBy: { name: 'asc' },

@@ -1,12 +1,12 @@
+import { unstable_noStore as noStore } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import Link from 'next/link'
 
-export const dynamic = 'force-dynamic'
-
 async function getOrder(orderId: string, userId: string) {
+  noStore()
   try {
     return await prisma.order.findFirst({
       where: { id: orderId, userId },

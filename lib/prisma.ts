@@ -10,17 +10,8 @@ const prismaClientSingleton = () => {
   })
 }
 
-// 只在有数据库URL时创建Prisma客户端
-const createPrismaClient = () => {
-  if (!process.env.DATABASE_URL) {
-    console.warn('DATABASE_URL not found, Prisma client will not be available')
-    return null as unknown as PrismaClient
-  }
-  return prismaClientSingleton()
-}
+export const prisma = globalForPrisma.prisma ?? prismaClientSingleton()
 
-export const prisma = globalForPrisma.prisma ?? createPrismaClient()
-
-if (process.env.NODE_ENV !== 'production' && prisma) {
+if (process.env.NODE_ENV !== 'production') {
   globalForPrisma.prisma = prisma
 }
