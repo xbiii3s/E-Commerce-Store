@@ -6,7 +6,10 @@ import { prisma } from '@/lib/prisma'
 import bcrypt from 'bcryptjs'
 
 export const authOptions: NextAuthOptions = {
-  adapter: PrismaAdapter(prisma) as any,
+  // 只在运行时使用 adapter，构建时跳过
+  ...(process.env.DATABASE_URL && process.env.DATABASE_URL !== 'file:./dev.db'
+    ? { adapter: PrismaAdapter(prisma) as any }
+    : {}),
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID || '',
@@ -23,25 +26,30 @@ export const authOptions: NextAuthOptions = {
           throw new Error('Please enter email and password')
         }
 
-        const user = await prisma.user.findUnique({
-          where: { email: credentials.email },
-        })
+        try {
+          const user = await prisma.user.findUnique({
+            where: { email: credentials.email },
+          })
 
-        if (!user || !user.password) {
-          throw new Error('Invalid email or password')
-        }
+          if (!user || !user.password) {
+            throw new Error('Invalid email or password')
+          }
 
-        const isValid = await bcrypt.compare(credentials.password, user.password)
+          const isValid = await bcrypt.compare(credentials.password, user.password)
 
-        if (!isValid) {
-          throw new Error('Invalid email or password')
-        }
+          if (!isValid) {
+            throw new Error('Invalid email or password')
+          }
 
-        return {
-          id: user.id,
-          email: user.email,
-          name: user.name,
-          role: user.role,
+          return {
+            id: user.id,
+            email: user.email,
+            name: user.name,
+            role: user.role,
+          }
+        } catch (error) {
+          console.error('Auth error:', error)
+          throw new Error('Authentication failed')
         }
       },
     }),
@@ -69,4 +77,5 @@ export const authOptions: NextAuthOptions = {
       return session
     },
   },
+  secret: process.env.NEXTAUTH_SECRET,
 }
