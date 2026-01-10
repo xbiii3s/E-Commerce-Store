@@ -1,10 +1,18 @@
 import { prisma } from '@/lib/prisma'
 import ProductForm from '@/components/admin/ProductForm'
 
+export const dynamic = 'force-dynamic'
+
 async function getCategories() {
-  return prisma.category.findMany({
-    orderBy: { name: 'asc' },
-  })
+  if (!prisma) return []
+  try {
+    return await prisma.category.findMany({
+      orderBy: { name: 'asc' },
+    })
+  } catch (error) {
+    console.error('Error fetching categories:', error)
+    return []
+  }
 }
 
 export default async function NewProductPage() {

@@ -5,10 +5,13 @@ import FeaturedProductsSection from '@/components/home/FeaturedProductsSection'
 import FeaturesSection from '@/components/home/FeaturesSection'
 import NewsletterSection from '@/components/home/NewsletterSection'
 
-// 强制动态渲染
+// 强制动态渲染，跳过构建时预渲染
 export const dynamic = 'force-dynamic'
+export const fetchCache = 'force-no-store'
+export const revalidate = 0
 
 async function getFeaturedProducts() {
+  if (!prisma) return []
   try {
     return await prisma.product.findMany({
       where: { featured: true, active: true },
@@ -22,6 +25,7 @@ async function getFeaturedProducts() {
 }
 
 async function getCategories() {
+  if (!prisma) return []
   try {
     return await prisma.category.findMany({
       include: { _count: { select: { products: true } } },

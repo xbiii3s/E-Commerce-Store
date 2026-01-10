@@ -15,33 +15,44 @@ function getProductImage(images: string, productName: string): string {
 }
 
 async function getProduct(slug: string) {
-  const product = await prisma.product.findUnique({
-    where: { slug },
-    include: {
-      category: true,
-      reviews: {
-        where: { approved: true },
-        orderBy: { createdAt: 'desc' },
-        take: 5,
+  if (!prisma) notFound()
+  try {
+    const product = await prisma.product.findUnique({
+      where: { slug },
+      include: {
+        category: true,
+        reviews: {
+          where: { approved: true },
+          orderBy: { createdAt: 'desc' },
+          take: 5,
+        },
       },
-    },
-  })
+    })
 
-  if (!product) notFound()
-  return product
+    if (!product) notFound()
+    return product
+  } catch (error) {
+    console.error('Error fetching product:', error)
+    notFound()
+  }
 }
 
 async function getRelatedProducts(categoryId: string | null, productId: string) {
-  if (!categoryId) return []
-  return prisma.product.findMany({
-    where: {
-      categoryId,
-      id: { not: productId },
-      active: true,
-    },
-    include: { category: true },
-    take: 4,
-  })
+  if (!prisma || !categoryId) return []
+  try {
+    return await prisma.product.findMany({
+      where: {
+        categoryId,
+        id: { not: productId },
+        active: true,
+      },
+      include: { category: true },
+      take: 4,
+    })
+  } catch (error) {
+    console.error('Error fetching related products:', error)
+    return []
+  }
 }
 
 export default async function ProductPage({ params }: { params: { slug: string } }) {
