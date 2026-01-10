@@ -1,15 +1,19 @@
 import { NextAuthOptions } from 'next-auth'
 import CredentialsProvider from 'next-auth/providers/credentials'
 import GoogleProvider from 'next-auth/providers/google'
-import { PrismaAdapter } from '@auth/prisma-adapter'
-import { prisma } from '@/lib/prisma'
-import bcrypt from 'bcryptjs'
+
+// 延迟导入 Prisma，避免构建时错误
+const getPrisma = async () => {
+  const { prisma } = await import('@/lib/prisma')
+  return prisma
+}
+
+const getBcrypt = async () => {
+  const bcrypt = await import('bcryptjs')
+  return bcrypt.default
+}
 
 export const authOptions: NextAuthOptions = {
-  // 只在运行时使用 adapter，构建时跳过
-  ...(process.env.DATABASE_URL && process.env.DATABASE_URL !== 'file:./dev.db'
-    ? { adapter: PrismaAdapter(prisma) as any }
-    : {}),
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID || '',
@@ -27,6 +31,9 @@ export const authOptions: NextAuthOptions = {
         }
 
         try {
+          const prisma = await getPrisma()
+          const bcrypt = await getBcrypt()
+
           const user = await prisma.user.findUnique({
             where: { email: credentials.email },
           })
@@ -64,15 +71,15 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
-        (token as any).role = (user as any).role
-        (token as any).id = user.id
+        ;(token as any).role = (user as any).role
+        ;(token as any).id = user.id
       }
       return token
     },
     async session({ session, token }) {
       if (session.user) {
-        (session.user as any).role = (token as any).role
-        (session.user as any).id = (token as any).id
+        ;(session.user as any).role = (token as any).role
+        ;(session.user as any).id = (token as any).id
       }
       return session
     },
