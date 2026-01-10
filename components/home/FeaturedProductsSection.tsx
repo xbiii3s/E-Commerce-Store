@@ -17,13 +17,18 @@ interface Product {
 export default function FeaturedProductsSection({ products }: { products: Product[] }) {
   const { t } = useTranslation()
 
+  // 如果没有商品，不显示这个区块
+  if (!products || products.length === 0) {
+    return null
+  }
+
   return (
     <section className="py-16">
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center mb-8">
           <h2 className="text-3xl font-bold">{t.home.featuredProducts}</h2>
           <Link
-            href="/products?featured=true"
+            href="/products"
             className="text-primary-600 hover:text-primary-700 font-semibold"
           >
             {t.home.viewAll} →

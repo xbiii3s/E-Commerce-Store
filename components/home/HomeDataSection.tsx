@@ -30,13 +30,27 @@ export default function HomeDataSection() {
     async function fetchData() {
       try {
         const [productsRes, categoriesRes] = await Promise.all([
-          fetch('/api/products?featured=true&limit=8'),
+          fetch('/api/products?limit=8'),  // 先获取最新商品
           fetch('/api/categories'),
         ])
 
         if (productsRes.ok) {
           const productsData = await productsRes.json()
-          setProducts(productsData.products || productsData || [])
+          let productsList = productsData.products || productsData || []
+          
+          // 如果有商品，尝试获取精选商品
+          if (productsList.length > 0) {
+            const featuredRes = await fetch('/api/products?featured=true&limit=8')
+            if (featuredRes.ok) {
+              const featuredData = await featuredRes.json()
+              const featuredProducts = featuredData.products || []
+              // 如果有精选商品则使用精选商品，否则使用最新商品
+              if (featuredProducts.length > 0) {
+                productsList = featuredProducts
+              }
+            }
+          }
+          setProducts(productsList)
         }
 
         if (categoriesRes.ok) {
