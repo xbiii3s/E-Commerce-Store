@@ -4,6 +4,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import Link from 'next/link'
+import { translations } from '@/lib/i18n/translations'
 
 async function getUserOrders(userId: string, email: string) {
   noStore()
@@ -34,16 +35,19 @@ export default async function OrdersPage() {
   const userId = (session.user as any).id
   const userEmail = session.user.email!
   const orders = await getUserOrders(userId, userEmail)
+  
+  // 默认使用中文，可根据需要改为基于locale的动态选择
+  const t = translations.zh
 
   return (
     <div className="container mx-auto px-4 py-8">
       <Link href="/account" className="text-primary-600 hover:underline mb-6 inline-block">
-        ← Back to Account
+        {t.orders.backToAccount}
       </Link>
 
       <div className="bg-white rounded-lg shadow-sm">
         <div className="p-6 border-b">
-          <h1 className="text-2xl font-bold">My Orders</h1>
+          <h1 className="text-2xl font-bold">{t.orders.title}</h1>
         </div>
 
         {orders.length > 0 ? (
@@ -51,12 +55,12 @@ export default async function OrdersPage() {
             <table className="w-full">
               <thead className="border-b bg-gray-50">
                 <tr className="text-left text-sm">
-                  <th className="px-6 py-3 font-semibold">Order Number</th>
-                  <th className="px-6 py-3 font-semibold">Date</th>
-                  <th className="px-6 py-3 font-semibold">Status</th>
-                  <th className="px-6 py-3 font-semibold">Payment</th>
-                  <th className="px-6 py-3 font-semibold">Total</th>
-                  <th className="px-6 py-3 font-semibold">Action</th>
+                  <th className="px-6 py-3 font-semibold">{t.orders.orderNumber}</th>
+                  <th className="px-6 py-3 font-semibold">{t.orders.date}</th>
+                  <th className="px-6 py-3 font-semibold">{t.orders.status}</th>
+                  <th className="px-6 py-3 font-semibold">{t.orders.paymentStatus}</th>
+                  <th className="px-6 py-3 font-semibold">{t.orders.total}</th>
+                  <th className="px-6 py-3 font-semibold">{t.orders.action}</th>
                 </tr>
               </thead>
               <tbody>
@@ -78,7 +82,7 @@ export default async function OrdersPage() {
                             : 'bg-gray-100 text-gray-700'
                         }`}
                       >
-                        {order.status}
+                        {t.orders[order.status as keyof typeof t.orders] || order.status}
                       </span>
                     </td>
                     <td className="px-6 py-3">
@@ -89,7 +93,7 @@ export default async function OrdersPage() {
                             : 'bg-yellow-100 text-yellow-700'
                         }`}
                       >
-                        {order.paymentStatus}
+                        {t.orders[order.paymentStatus as keyof typeof t.orders] || order.paymentStatus}
                       </span>
                     </td>
                     <td className="px-6 py-3 font-medium">
@@ -100,7 +104,7 @@ export default async function OrdersPage() {
                         href={`/account/orders/${order.id}`}
                         className="text-primary-600 hover:underline"
                       >
-                        View
+                        {t.orders.view}
                       </Link>
                     </td>
                   </tr>
@@ -110,12 +114,12 @@ export default async function OrdersPage() {
           </div>
         ) : (
           <div className="p-6 text-center text-gray-500">
-            <p className="mb-4">You haven't placed any orders yet.</p>
+            <p className="mb-4">{t.orders.noOrders}</p>
             <Link
               href="/products"
               className="text-primary-600 hover:underline font-medium"
             >
-              Start shopping
+              {t.orders.startShopping}
             </Link>
           </div>
         )}

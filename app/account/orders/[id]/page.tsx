@@ -4,6 +4,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import Link from 'next/link'
+import { translations } from '@/lib/i18n/translations'
 
 async function getOrder(orderId: string, userId: string, email: string) {
   noStore()
@@ -44,11 +45,12 @@ export default async function OrderDetailPage({
   }
 
   const shippingAddress = JSON.parse(order.shippingAddress || '{}')
+  const t = translations.zh
 
   return (
     <div className="container mx-auto px-4 py-8">
       <Link href="/account/orders" className="text-primary-600 hover:underline mb-6 inline-block">
-        ← Back to Orders
+        {t.orders.backToOrders}
       </Link>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -57,9 +59,9 @@ export default async function OrderDetailPage({
           <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
             <div className="flex justify-between items-start mb-6">
               <div>
-                <h1 className="text-2xl font-bold">Order {order.orderNumber}</h1>
+                <h1 className="text-2xl font-bold">{t.orders.orderNumber}: {order.orderNumber}</h1>
                 <p className="text-gray-500">
-                  {new Date(order.createdAt).toLocaleDateString()}
+                  {new Date(order.createdAt).toLocaleDateString('zh-CN')}
                 </p>
               </div>
               <span
