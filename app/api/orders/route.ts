@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { getServerSession } from 'next-auth'
+import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import Stripe from 'stripe'
 
@@ -23,10 +25,23 @@ export async function POST(request: NextRequest) {
 
     const orderNumber = generateOrderNumber()
 
+    // 检查是否有登录用户
+    const session = await getServerSession(authOptions)
+    let userId: string | null = null
+    
+    if (session?.user?.email) {
+      const user = await prisma.user.findUnique({
+        where: { email: session.user.email },
+        select: { id: true },
+      })
+      userId = user?.id || null
+    }
+
     // Create order in database
     const order = await prisma.order.create({
       data: {
         orderNumber,
+        userId,
         email: shippingAddress.email,
         phone: shippingAddress.phone || null,
         subtotal,

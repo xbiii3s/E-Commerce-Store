@@ -5,11 +5,17 @@ import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import Link from 'next/link'
 
-async function getOrder(orderId: string, userId: string) {
+async function getOrder(orderId: string, userId: string, email: string) {
   noStore()
   try {
     return await prisma.order.findFirst({
-      where: { id: orderId, userId },
+      where: {
+        id: orderId,
+        OR: [
+          { userId }, // 已登录用户的订单
+          { email }, // 通过邮箱匹配未登录用户的订单
+        ],
+      },
       include: { items: { include: { product: true } } },
     })
   } catch (error) {
@@ -30,7 +36,8 @@ export default async function OrderDetailPage({
   }
 
   const userId = (session.user as any).id
-  const order = await getOrder(params.id, userId)
+  const userEmail = session.user.email!
+  const order = await getOrder(params.id, userId, userEmail)
 
   if (!order) {
     redirect('/account/orders')

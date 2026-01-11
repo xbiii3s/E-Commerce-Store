@@ -5,12 +5,18 @@ import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import Link from 'next/link'
 
-async function getUserOrders(userId: string) {
+async function getUserOrders(userId: string, email: string) {
   noStore()
   try {
     return await prisma.order.findMany({
-      where: { userId },
+      where: {
+        OR: [
+          { userId }, // 已登录用户的订单
+          { email }, // 通过邮箱匹配未登录用户的订单
+        ],
+      },
       orderBy: { createdAt: 'desc' },
+      include: { items: true },
     })
   } catch (error) {
     console.error('Error fetching user orders:', error)
@@ -26,7 +32,8 @@ export default async function OrdersPage() {
   }
 
   const userId = (session.user as any).id
-  const orders = await getUserOrders(userId)
+  const userEmail = session.user.email!
+  const orders = await getUserOrders(userId, userEmail)
 
   return (
     <div className="container mx-auto px-4 py-8">
